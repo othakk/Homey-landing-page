@@ -125,16 +125,27 @@ function CampusesScreen() {
 /* ─── Main StickyScroll ─── */
 export default function StickyScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Screen cross-fade opacities
+  const { scrollYProgress: mobileProgress } = useScroll({
+    target: mobileRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Desktop cross-fade opacities
   const s0 = useTransform(scrollYProgress, [0, 0.28, 0.33], [1, 1, 0]);
   const s1 = useTransform(scrollYProgress, [0.27, 0.33, 0.60, 0.66], [0, 1, 1, 0]);
   const s2 = useTransform(scrollYProgress, [0.60, 0.66, 1], [0, 1, 1]);
+
+  // Mobile cross-fade opacities (same curve, separate scroll source)
+  const m0 = useTransform(mobileProgress, [0, 0.28, 0.33], [1, 1, 0]);
+  const m1 = useTransform(mobileProgress, [0.27, 0.33, 0.60, 0.66], [0, 1, 1, 0]);
+  const m2 = useTransform(mobileProgress, [0.60, 0.66, 1], [0, 1, 1]);
 
   // Text visibility — synced with phone screen midpoints
   const [activeText, setActiveText] = useState(0);
@@ -144,7 +155,15 @@ export default function StickyScroll() {
     else setActiveText(2);
   });
 
+  const [mobileActiveText, setMobileActiveText] = useState(0);
+  useMotionValueEvent(mobileProgress, "change", (v) => {
+    if (v < 0.33) setMobileActiveText(0);
+    else if (v < 0.66) setMobileActiveText(1);
+    else setMobileActiveText(2);
+  });
+
   const screenOpacities = [s0, s1, s2];
+  const mobileOpacities = [m0, m1, m2];
 
   const screenComponents = [
     <SwipeScreen key="swipe" />,
@@ -217,36 +236,70 @@ export default function StickyScroll() {
         </div>
       </section>
 
-      {/* ─── Mobile: simple stacked cards, no sticky, no viewport math ─── */}
-      <section className="md:hidden relative py-16 overflow-hidden">
+      {/* ─── Mobile: sticky scroll-driven cross-fade (stacked vertically) ─── */}
+      <section
+        ref={mobileRef}
+        className="md:hidden relative"
+        style={{ minHeight: "260vh" }}
+      >
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[10%] right-[-10%] w-[300px] h-[300px] rounded-full bg-stone-300/20 blur-[100px]" />
           <div className="absolute bottom-[20%] left-[-10%] w-[280px] h-[280px] rounded-full bg-stone-400/15 blur-[90px]" />
         </div>
 
-        <div className="relative max-w-md mx-auto px-6 space-y-20">
-          {FEATURES.map((feature, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, ease: "easeOut" as const }}
-              className="flex flex-col items-center text-center"
-            >
-              <div className="mb-8">
-                <PhoneFrame>{screenComponents[i]}</PhoneFrame>
-              </div>
-              <div className="glass-card p-6">
-                <h3 className="text-2xl font-bold tracking-tight text-stone-800 mb-3">
-                  {feature.title}
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
+          {/* Phone */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 -m-6 flex items-center justify-center pointer-events-none">
+              <div className="w-[300px] h-[560px] rounded-[48px] bg-gradient-to-b from-stone-400/[0.10] via-stone-300/[0.06] to-transparent blur-2xl" />
+            </div>
+            <div className="animate-float">
+              <PhoneFrame>
+                {screenComponents.map((screen, i) => (
+                  <motion.div
+                    key={i}
+                    style={{ opacity: mobileOpacities[i] }}
+                    className="absolute inset-0 z-10"
+                  >
+                    {screen}
+                  </motion.div>
+                ))}
+              </PhoneFrame>
+            </div>
+          </div>
+
+          {/* Text card */}
+          <div className="relative w-full max-w-sm h-[160px] flex items-start justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={mobileActiveText}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15, ease: "easeOut" as const }}
+                className="glass-card p-5 text-center w-full"
+              >
+                <h3 className="text-xl font-bold tracking-tight text-stone-800 mb-2">
+                  {FEATURES[mobileActiveText].title}
                 </h3>
-                <p className="text-base text-stone-500 leading-relaxed max-w-sm">
-                  {feature.description}
+                <p className="text-sm text-stone-500 leading-relaxed">
+                  {FEATURES[mobileActiveText].description}
                 </p>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Progress dots */}
+          <div className="mt-5 flex items-center gap-2">
+            {FEATURES.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  mobileActiveText === i ? "w-6 bg-stone-800" : "w-1.5 bg-stone-300"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </>
