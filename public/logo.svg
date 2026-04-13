@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Rounded square background -->
+  <rect x="2" y="2" width="116" height="116" rx="26" fill="#f0ebe1" stroke="#4a4543" stroke-width="0"/>
+  <!-- House shape -->
+  <g stroke="#4a4543" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Roof -->
+    <polyline points="28,58 60,28 92,58" />
+    <!-- Left wall -->
+    <line x1="32" y1="55" x2="32" y2="92" />
+    <!-- Right wall -->
+    <line x1="88" y1="55" x2="88" y2="92" />
+    <!-- Floor connecting to H -->
+    <line x1="32" y1="92" x2="48" y2="92" />
+    <line x1="72" y1="92" x2="88" y2="92" />
+    <!-- H left pillar -->
+    <line x1="48" y1="58" x2="48" y2="92" />
+    <!-- H right pillar -->
+    <line x1="72" y1="58" x2="72" y2="92" />
+    <!-- H crossbar -->
+    <line x1="48" y1="74" x2="72" y2="74" />
+  </g>
+</svg>
