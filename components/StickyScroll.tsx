@@ -153,91 +153,102 @@ export default function StickyScroll() {
   ];
 
   return (
-    <section ref={containerRef} className="relative" style={{ minHeight: "300vh" }}>
-      {/* Background orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-stone-300/20 blur-[120px]" />
-        <div className="absolute bottom-[30%] left-[5%] w-[350px] h-[350px] rounded-full bg-stone-400/15 blur-[100px]" />
-      </div>
+    <>
+      {/* ─── Desktop: sticky scroll-driven cross-fade ─── */}
+      <section
+        ref={containerRef}
+        className="relative hidden md:block"
+        style={{ minHeight: "300vh" }}
+      >
+        {/* Background orbs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-stone-300/20 blur-[120px]" />
+          <div className="absolute bottom-[30%] left-[5%] w-[350px] h-[350px] rounded-full bg-stone-400/15 blur-[100px]" />
+        </div>
 
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <div className="max-w-6xl w-full mx-auto px-6">
-          {/* Desktop: 2-col grid */}
-          <div className="hidden md:grid grid-cols-2 gap-16 items-center">
-            {/* Phone left — floating + hover lift */}
-            <div className="flex justify-center">
-              <motion.div
-                whileHover={{ y: -6 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="relative"
-              >
-                {/* Glow behind phone */}
-                <div className="absolute inset-0 -m-8 flex items-center justify-center pointer-events-none">
-                  <div className="w-[340px] h-[640px] rounded-[56px] bg-gradient-to-b from-stone-400/[0.12] via-stone-300/[0.08] to-transparent blur-2xl" />
-                </div>
-                <div className="animate-float">
-                  <PhoneFrame>
-                    {screenComponents.map((screen, i) => (
-                      <motion.div key={i} style={{ opacity: screenOpacities[i] }} className="absolute inset-0 z-10">
-                        {screen}
-                      </motion.div>
-                    ))}
-                  </PhoneFrame>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Text right — glass card, animated fade in/out */}
-            <div className="relative h-[400px] flex items-center">
-              <AnimatePresence mode="wait">
+        <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+          <div className="max-w-6xl w-full mx-auto px-6">
+            <div className="grid grid-cols-2 gap-16 items-center">
+              {/* Phone left — floating + hover lift */}
+              <div className="flex justify-center">
                 <motion.div
-                  key={activeText}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.15, ease: "easeOut" as const }}
-                  className="glass-card p-8"
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="relative"
                 >
-                  <h3 className="text-4xl lg:text-5xl font-bold tracking-[-0.03em] text-stone-800 leading-tight mb-4">
-                    {FEATURES[activeText].title}
-                  </h3>
-                  <p className="text-lg text-stone-500 leading-relaxed max-w-md">
-                    {FEATURES[activeText].description}
-                  </p>
+                  {/* Glow behind phone */}
+                  <div className="absolute inset-0 -m-8 flex items-center justify-center pointer-events-none">
+                    <div className="w-[340px] h-[640px] rounded-[56px] bg-gradient-to-b from-stone-400/[0.12] via-stone-300/[0.08] to-transparent blur-2xl" />
+                  </div>
+                  <div className="animate-float">
+                    <PhoneFrame>
+                      {screenComponents.map((screen, i) => (
+                        <motion.div key={i} style={{ opacity: screenOpacities[i] }} className="absolute inset-0 z-10">
+                          {screen}
+                        </motion.div>
+                      ))}
+                    </PhoneFrame>
+                  </div>
                 </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
+              </div>
 
-          {/* Mobile: stacked cards */}
-          <div className="md:hidden space-y-24 py-20">
-            {FEATURES.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.6, ease: "easeOut" as const }}
-                className="flex flex-col items-center text-center"
-              >
-                <div className="mb-8">
-                  <PhoneFrame>
-                    {screenComponents[i]}
-                  </PhoneFrame>
-                </div>
-                <div className="glass-card p-6">
-                  <h3 className="text-2xl font-bold tracking-tight text-stone-800 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-base text-stone-500 leading-relaxed max-w-sm">
-                    {feature.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+              {/* Text right — glass card, animated fade in/out */}
+              <div className="relative h-[400px] flex items-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeText}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15, ease: "easeOut" as const }}
+                    className="glass-card p-8"
+                  >
+                    <h3 className="text-4xl lg:text-5xl font-bold tracking-[-0.03em] text-stone-800 leading-tight mb-4">
+                      {FEATURES[activeText].title}
+                    </h3>
+                    <p className="text-lg text-stone-500 leading-relaxed max-w-md">
+                      {FEATURES[activeText].description}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ─── Mobile: simple stacked cards, no sticky, no viewport math ─── */}
+      <section className="md:hidden relative py-16 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[10%] right-[-10%] w-[300px] h-[300px] rounded-full bg-stone-300/20 blur-[100px]" />
+          <div className="absolute bottom-[20%] left-[-10%] w-[280px] h-[280px] rounded-full bg-stone-400/15 blur-[90px]" />
+        </div>
+
+        <div className="relative max-w-md mx-auto px-6 space-y-20">
+          {FEATURES.map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: "easeOut" as const }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-8">
+                <PhoneFrame>{screenComponents[i]}</PhoneFrame>
+              </div>
+              <div className="glass-card p-6">
+                <h3 className="text-2xl font-bold tracking-tight text-stone-800 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-base text-stone-500 leading-relaxed max-w-sm">
+                  {feature.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
