@@ -19,6 +19,7 @@ const linkColumns = [
     links: [
       { label: "How it Works", href: "/#faq" },
       { label: "Campuses", href: "/campuses" },
+      { label: "Support", href: "/support" },
     ],
   },
   {

@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const NAV_LINKS = [
   { label: "Campuses", href: "/campuses" },
   { label: "FAQ", href: "/#faq" },
+  { label: "Support", href: "/support" },
 ];
 
 export default function Navbar() {
